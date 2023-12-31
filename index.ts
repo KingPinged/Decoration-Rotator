@@ -87,12 +87,11 @@ export default definePlugin({
 
     const body = await (async function () {
       while (true) {
-        const { body } = await RestAPI.get({
+        const { body, ok } = await RestAPI.get({
           url: "/users/@me/collectibles-purchases",
         }).catch(console.error);
 
-        // TODO if failed GET request
-        if (body === null) {
+        if (ok === false) {
           sleep(retryCooldown + tries * 3000);
           tries = Math.min(tries + 1, 20);
 
