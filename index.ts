@@ -15,6 +15,7 @@ enum RotationDelay {
   Daily,
   Hourly,
   Weekly,
+  //minutely WILL cause rate limit, only use for dev testing!!!
   Minutely,
 }
 
