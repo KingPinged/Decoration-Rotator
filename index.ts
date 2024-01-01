@@ -15,7 +15,7 @@ enum RotationDelay {
   Daily,
   Hourly,
   Weekly,
-  //minutely WILL cause rate limit, only use for dev testing!!!
+  // minutely WILL cause rate limit, only use for dev testing!!!
   Minutely,
 }
 
@@ -81,6 +81,7 @@ export default definePlugin({
     // This settings thing is confusing
     const settings = Settings.plugins["Decoration Rotatator"];
 
+    currIndex = Number(localStorage.getItem("currIndexDR")) || 0;
     startDate =
       Number(localStorage.getItem("startDateDecorationRotate")) || Date.now();
 
@@ -118,9 +119,18 @@ export default definePlugin({
       ]);
     }
 
-    used = new Array(decorations.length).map((val, i) => {
-      return i;
-    });
+    used = localStorage.getItem("usedArrDR")
+      ? JSON.parse(localStorage.getItem("usedArrDR") || "[]")
+      : new Array(decorations.length).map((val, i) => {
+          return i;
+        });
+
+    // if length of used doesnt match decorations length, then we need to reset it
+    if (used.length !== decorations.length) {
+      used = new Array(decorations.length).map((val, i) => {
+        return i;
+      });
+    }
 
     // /???? why wont it let me set to 0
     if (decorations.length === 1) {
@@ -208,9 +218,9 @@ async function setDecoration(settings, decIndex?) {
           body: "You are being rate limited!",
         });
 
-        console.log("Rate limited, waiting 180 seconds");
+        console.log("Rate limited, waiting 300 seconds");
 
-        await sleep(180000);
+        await sleep(300000);
 
         return setDecoration(settings, decIndex);
       }
@@ -250,6 +260,8 @@ async function setDecoration(settings, decIndex?) {
     currIndex = 0;
   }
 
+  localStorage.setItem("currIndexDR", currIndex.toString());
+  localStorage.setItem("usedArrDR", JSON.stringify(used));
   localStorage.setItem("startDateDecorationRotate", Date.now().toString());
 
   return true;
